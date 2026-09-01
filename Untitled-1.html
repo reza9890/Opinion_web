@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<title>Opinion</title>
+<style>
+  :root {
+    --bg: rgb(22, 14, 10);
+    --card: rgb(37, 24, 17);
+    --card-2: rgb(46, 31, 22);
+    --cream: rgb(240, 224, 199);
+    --cream-dark: rgb(173, 153, 128);
+    --autumn: rgb(199, 110, 51);
+    --autumn-light: rgb(235, 156, 82);
+    --danger: rgb(184, 71, 56);
+    --green: rgb(115, 173, 97);
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--cream);
+    font-family: Tahoma, "Segoe UI", sans-serif;
+    height: 100%;
+  }
+
+  #app {
+    max-width: 400px;
+    margin: 0 auto;
+    height: 100vh;
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .screen {
+    display: none;
+    flex-direction: column;
+    height: 100%;
+    padding: 12px;
+    overflow: hidden;
+  }
+
+  .screen.active { display: flex; }
+
+  /* ============ LOGIN ============ */
+
+  #login-screen {
+    padding: 25px;
+    justify-content: center;
+  }
+
+  .login-spacer-top { flex: 0 0 15%; }
+  .login-spacer-bottom { flex: 0 0 25%; }
+
+  .logo {
+    font-size: 46px;
+    color: var(--autumn-light);
+    font-weight: bold;
+    text-align: center;
+    height: 65px;
+    line-height: 65px;
+  }
+
+  .app-title {
+    font-size: 25px;
+    font-weight: bold;
+    color: var(--cream);
+    text-align: center;
+    height: 42px;
+    line-height: 42px;
+  }
+
+  .app-subtitle {
+    font-size: 12px;
+    color: var(--cream-dark);
+    text-align: center;
+    height: 28px;
+    line-height: 28px;
+  }
+
+  input[type="text"], input[type="password"], textarea {
+    width: 100%;
+    background: var(--card);
+    border: none;
+    border-radius: 14px;
+    color: var(--cream);
+    font-family: inherit;
+    font-size: 14px;
+    padding: 14px 15px;
+    margin-bottom: 12px;
+    outline: none;
+  }
+
+  input::placeholder, textarea::placeholder { color: var(--cream-dark); }
+
+  .login-message {
+    font-size: 11px;
+    color: var(--danger);
+    text-align: center;
+    height: 30px;
+    line-height: 30px;
+  }
+
+  button {
+    font-family: inherit;
+    border: none;
+    border-radius: 14px;
+    cursor: pointer;
+  }
+
+  .btn-primary {
+    width: 100%;
+    height: 50px;
+    background: var(--autumn);
+    color: var(--bg);
+    font-size: 14px;
+    margin-bottom: 12px;
+  }
+
+  .btn-secondary {
+    width: 100%;
+    height: 48px;
+    background: var(--card-2);
+    color: var(--autumn-light);
+    font-size: 13px;
+  }
+
+  /* ============ HEADER ============ */
+
+  .header {
+    font-size: 25px;
+    font-weight: bold;
+    color: var(--cream);
+    height: 55px;
+    line-height: 55px;
+  }
+
+  .welcome-label {
+    font-size: 11px;
+    color: var(--cream-dark);
+    text-align: right;
+    height: 25px;
+    line-height: 25px;
+  }
+
+  /* ============ SCROLL AREAS ============ */
+
+  .scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 2px;
+  }
+
+  .empty-label {
+    font-size: 13px;
+    color: var(--cream-dark);
+    text-align: center;
+    height: 70px;
+    line-height: 70px;
+  }
+
+  /* ============ POST CARD ============ */
+
+  .post-card {
+    background: var(--card);
+    border-radius: 18px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  .post-user {
+    font-size: 13px;
+    font-weight: bold;
+    color: var(--autumn-light);
+    height: 25px;
+    line-height: 25px;
+  }
+
+  .post-content {
+    font-size: 13px;
+    color: var(--cream);
+    min-height: 40px;
+    white-space: pre-wrap;
+  }
+
+  .post-hashtags {
+    font-size: 11px;
+    color: var(--autumn);
+    min-height: 16px;
+  }
+
+  .post-actions {
+    display: flex;
+    gap: 8px;
+    height: 36px;
+    margin-top: 4px;
+  }
+
+  .btn-like {
+    flex: 1;
+    height: 36px;
+    background: var(--card-2);
+    color: var(--autumn-light);
+    font-size: 12px;
+  }
+
+  .btn-like[disabled] {
+    background: rgb(61, 51, 36);
+    cursor: default;
+  }
+
+  .btn-delete {
+    flex: 1;
+    height: 36px;
+    background: rgb(46, 19, 17);
+    color: var(--danger);
+    font-size: 12px;
+  }
+
+  /* ============ NAV ============ */
+
+  .nav {
+    display: flex;
+    gap: 8px;
+    height: 58px;
+    flex-shrink: 0;
+  }
+
+  .nav button {
+    flex: 1;
+    height: 55px;
+    font-size: 13px;
+  }
+
+  .nav .nav-active { background: var(--autumn); color: var(--bg); }
+  .nav .nav-inactive { background: var(--card-2); color: var(--cream); }
+
+  /* ============ PROFILE ============ */
+
+  .profile-card {
+    background: var(--card);
+    border-radius: 18px;
+    padding: 15px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    margin-bottom: 9px;
+  }
+
+  .profile-username {
+    font-size: 18px;
+    font-weight: bold;
+    color: var(--cream);
+    text-align: right;
+    width: 100%;
+  }
+
+  .section-title {
+    font-size: 14px;
+    font-weight: bold;
+    color: var(--autumn-light);
+    text-align: right;
+    height: 28px;
+    line-height: 28px;
+  }
+
+  .composer {
+    background: var(--card);
+    border-radius: 18px;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    flex-shrink: 0;
+    margin-bottom: 9px;
+  }
+
+  .composer textarea {
+    background: rgb(26, 17, 12);
+    height: 70px;
+    resize: none;
+    margin-bottom: 0;
+  }
+
+  .composer input[type="text"] {
+    background: rgb(26, 17, 12);
+    color: var(--autumn-light);
+    font-size: 12px;
+    padding: 9px 12px;
+    height: 40px;
+    margin-bottom: 0;
+  }
+
+  .btn-send {
+    width: 100%;
+    height: 40px;
+    background: var(--autumn);
+    color: var(--bg);
+    font-size: 13px;
+  }
+
+  .btn-logout {
+    width: 100%;
+    height: 42px;
+    background: rgb(46, 19, 17);
+    color: var(--danger);
+    font-size: 12px;
+    margin-top: 8px;
+    flex-shrink: 0;
+  }
+
+  ::-webkit-scrollbar { width: 3px; }
+  ::-webkit-scrollbar-thumb { background: var(--card-2); }
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ============ LOGIN SCREEN ============ -->
+  <div id="login-screen" class="screen active">
+    <div class="login-spacer-top"></div>
+    <div class="logo">✦</div>
+    <div class="app-title">OPINION</div>
+    <div class="app-subtitle">A place for your opinions</div>
+    <input type="text" id="username-input" placeholder="Username" />
+    <input type="password" id="password-input" placeholder="Password" />
+    <div class="login-message" id="login-message"></div>
+    <button class="btn-primary" id="login-btn">Login</button>
+    <button class="btn-secondary" id="register-btn">Create account</button>
+    <div class="login-spacer-bottom"></div>
+  </div>
+
+  <!-- ============ EXPLORE SCREEN ============ -->
+  <div id="explore-screen" class="screen">
+    <div class="header">Explore</div>
+    <div class="welcome-label" id="welcome-label"></div>
+    <div class="scroll-area" id="posts-container"></div>
+    <div class="nav">
+      <button class="nav-active" id="explore-nav-explore">Explore</button>
+      <button class="nav-inactive" id="explore-nav-profile">Profile</button>
+    </div>
+  </div>
+
+  <!-- ============ PROFILE SCREEN ============ -->
+  <div id="profile-screen" class="screen">
+    <div class="header">Profile</div>
+    <div class="profile-card">
+      <div class="profile-username" id="profile-username-label"></div>
+    </div>
+    <div class="section-title">Create Post</div>
+    <div class="composer">
+      <textarea id="profile-post-input" placeholder="Write your opinion..."></textarea>
+      <input type="text" id="profile-hashtag-input" placeholder="Hashtag - example: art, music" />
+      <button class="btn-send" id="send-btn">Send</button>
+    </div>
+    <div class="section-title">My Posts</div>
+    <div class="scroll-area" id="my-posts-container"></div>
+    <div class="nav">
+      <button class="nav-inactive" id="profile-nav-explore">Explore</button>
+      <button class="nav-active" id="profile-nav-profile">Profile</button>
+    </div>
+    <button class="btn-logout" id="logout-btn">Logout</button>
+  </div>
+
+</div>
+
+<script>
+  // ============================================================
+  // FIREBASE
+  // ============================================================
+
+  const FIREBASE_URL = "https://appp-571e8-default-rtdb.firebaseio.com";
+
+  function firebasePath(path) {
+    return FIREBASE_URL.replace(/\/$/, "") + "/" + path.replace(/^\/|\/$/g, "") + ".json";
+  }
+
+  // ============================================================
+  // STATE
+  // ============================================================
+
+  let token = "";
+  let username = "";
+
+  // ============================================================
+  // HELPERS
+  // ============================================================
+
+  function normalizeUsername(value) {
+    return value.trim().toLowerCase();
+  }
+
+  async function hashPassword(password) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(password);
+    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+  }
+
+  function setLoginMessage(text) {
+    document.getElementById("login-message").textContent = text;
+  }
+
+  function formatHashtags(hashtags) {
+    if (!hashtags) return "";
+    if (typeof hashtags === "string") hashtags = [hashtags];
+    const result = [];
+    for (let hashtag of hashtags) {
+      hashtag = String(hashtag).trim();
+      if (!hashtag) continue;
+      if (!hashtag.startsWith("#")) hashtag = "#" + hashtag;
+      result.push(hashtag);
+    }
+    return result.join("   ");
+  }
+
+  function parseHashtags(text) {
+    if (!text) return [];
+    text = text.replace(/،/g, ",");
+    text = text.replace(/\n/g, ",");
+    text = text.replace(/ /g, ",");
+    const parts = text.split(",");
+    const result = [];
+    for (let part of parts) {
+      part = part.trim();
+      if (!part) continue;
+      if (part.startsWith("#")) part = part.slice(1);
+      part = part.trim();
+      if (part && !result.includes(part)) result.push(part);
+    }
+    return result;
+  }
+
+  // ============================================================
+  // LOGIN
+  // ============================================================
+
+  document.getElementById("login-btn").addEventListener("click", () => {
+    const usernameValue = normalizeUsername(document.getElementById("username-input").value);
+    const passwordValue = document.getElementById("password-input").value.trim();
+
+    if (!usernameValue || !passwordValue) {
+      setLoginMessage("Enter username and password");
+      return;
+    }
+
+    setLoginMessage("Logging in...");
+    firebaseLogin(usernameValue, passwordValue);
+  });
+
+  async function firebaseLogin(usernameValue, passwordValue) {
+    try {
+      const response = await fetch(firebasePath(`users/${usernameValue}`));
+
+      if (!response.ok) {
+        setLoginMessage("Firebase connection error");
+        return;
+      }
+
+      const user = await response.json();
+
+      if (!user) {
+        setLoginMessage("Username not found");
+        return;
+      }
+
+      const savedPassword = user.password_hash || "";
+      const enteredPassword = await hashPassword(passwordValue);
+
+      if (savedPassword !== enteredPassword) {
+        setLoginMessage("Wrong password");
+        return;
+      }
+
+      loginSuccess(usernameValue);
+    } catch (error) {
+      console.error("LOGIN ERROR:", error);
+      setLoginMessage("Could not connect to Firebase");
+    }
+  }
+
+  // ============================================================
+  // REGISTER
+  // ============================================================
+
+  document.getElementById("register-btn").addEventListener("click", () => {
+    const usernameValue = normalizeUsername(document.getElementById("username-input").value);
+    const passwordValue = document.getElementById("password-input").value.trim();
+
+    if (!usernameValue || !passwordValue) {
+      setLoginMessage("Enter username and password");
+      return;
+    }
+
+    if (usernameValue.length < 3) {
+      setLoginMessage("Username must have at least 3 characters");
+      return;
+    }
+
+    setLoginMessage("Checking username...");
+    firebaseRegister(usernameValue, passwordValue);
+  });
+
+  async function firebaseRegister(usernameValue, passwordValue) {
+    try {
+      const response = await fetch(firebasePath(`users/${usernameValue}`));
+
+      if (!response.ok) {
+        setLoginMessage("Firebase connection error");
+        return;
+      }
+
+      const existingUser = await response.json();
+
+      if (existingUser) {
+        setLoginMessage("Username already exists");
+        return;
+      }
+
+      // CREATE USER
+      //
+      // "hashtags" is a dictionary that keeps a counter for every
+      // hashtag ever created across the whole app. When a new
+      // account is created, it immediately gets every existing
+      // hashtag set to 0, so its structure matches every other
+      // user's.
+      const registryResponse = await fetch(firebasePath("hashtags_registry"));
+      let registry = {};
+
+      if (registryResponse.ok) {
+        const registryData = await registryResponse.json();
+        if (registryData && typeof registryData === "object") registry = registryData;
+      }
+
+      const userHashtags = {};
+      for (const hashtag of Object.keys(registry)) userHashtags[hashtag] = 0;
+
+      const userData = {
+        username: usernameValue,
+        password_hash: await hashPassword(passwordValue),
+        hashtags: userHashtags,
+      };
+
+      const createResponse = await fetch(firebasePath(`users/${usernameValue}`), {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(userData),
+      });
+
+      if (createResponse.ok) {
+        loginSuccess(usernameValue);
+      } else {
+        setLoginMessage("Could not create account");
+      }
+    } catch (error) {
+      console.error("REGISTER ERROR:", error);
+      setLoginMessage("Could not connect to Firebase");
+    }
+  }
+
+  // ============================================================
+  // LOGIN SUCCESS
+  // ============================================================
+
+  function loginSuccess(usernameValue) {
+    username = usernameValue;
+    token = "firebase-user";
+
+    document.getElementById("username-input").value = "";
+    document.getElementById("password-input").value = "";
+    setLoginMessage("");
+
+    document.getElementById("welcome-label").textContent = `@${username}`;
+    document.getElementById("profile-username-label").textContent = `@${username}`;
+
+    showScreen("explore-screen");
+    loadPosts();
+  }
+
+  // ============================================================
+  // NAVIGATION
+  // ============================================================
+
+  function showScreen(id) {
+    document.querySelectorAll(".screen").forEach((el) => el.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+  }
+
+  function gotoExplore() {
+    if (!token) {
+      showScreen("login-screen");
+      return;
+    }
+    showScreen("explore-screen");
+    loadPosts();
+  }
+
+  function gotoProfile() {
+    if (!token) {
+      showScreen("login-screen");
+      return;
+    }
+    showScreen("profile-screen");
+    document.getElementById("profile-username-label").textContent = `@${username}`;
+    loadMyPosts();
+  }
+
+  document.getElementById("explore-nav-explore").addEventListener("click", gotoExplore);
+  document.getElementById("explore-nav-profile").addEventListener("click", gotoProfile);
+  document.getElementById("profile-nav-explore").addEventListener("click", gotoExplore);
+  document.getElementById("profile-nav-profile").addEventListener("click", gotoProfile);
+
+  // ============================================================
+  // LOAD ALL POSTS
+  // ============================================================
+
+  async function loadPosts() {
+    try {
+      const response = await fetch(firebasePath("posts"));
+      if (!response.ok) return;
+
+      const data = await response.json();
+      const posts = [];
+
+      if (data && typeof data === "object") {
+        for (const [postId, post] of Object.entries(data)) {
+          if (!post || typeof post !== "object") continue;
+          posts.push({ ...post, id: postId });
+        }
+      }
+
+      posts.sort((a, b) => (b.created_at || 0) - (a.created_at || 0));
+      renderPosts(document.getElementById("posts-container"), posts, false);
+    } catch (error) {
+      console.error("LOAD POSTS ERROR:", error);
+    }
+  }
+
+  // ============================================================
+  // LOAD MY POSTS
+  // ============================================================
+
+  async function loadMyPosts() {
+    try {
+      const response = await fetch(firebasePath("posts"));
+      if (!response.ok) return;
+
+      const data = await response.json();
+      const posts = [];
+
+      if (data && typeof data === "object") {
+        for (const [postId, post] of Object.entries(data)) {
+          if (!post || typeof post !== "object") continue;
+          if (post.username !== username) continue;
+          posts.push({ ...post, id: postId });
+        }
+      }
+
+      posts.sort((a, b) => (b.created_at || 0) - (a.created_at || 0));
+      renderPosts(document.getElementById("my-posts-container"), posts, true);
+    } catch (error) {
+      console.error("MY POSTS ERROR:", error);
+    }
+  }
+
+  // ============================================================
+  // RENDER POSTS
+  // ============================================================
+
+  function renderPosts(container, posts, profile) {
+    container.innerHTML = "";
+
+    if (!posts.length) {
+      const empty = document.createElement("div");
+      empty.className = "empty-label";
+      empty.textContent = "No posts yet.";
+      container.appendChild(empty);
+      return;
+    }
+
+    for (const post of posts) {
+      container.appendChild(createPostCard(post, profile));
+    }
+  }
+
+  // ============================================================
+  // POST CARD
+  // ============================================================
+
+  function createPostCard(post, profile) {
+    const card = document.createElement("div");
+    card.className = "post-card";
+
+    const userLabel = document.createElement("div");
+    userLabel.className = "post-user";
+    userLabel.textContent = `@${post.username || "user"}`;
+    card.appendChild(userLabel);
+
+    const contentLabel = document.createElement("div");
+    contentLabel.className = "post-content";
+    contentLabel.textContent = post.content || "";
+    card.appendChild(contentLabel);
+
+    const hashtagLabel = document.createElement("div");
+    hashtagLabel.className = "post-hashtags";
+    hashtagLabel.textContent = formatHashtags(post.hashtags || []);
+    card.appendChild(hashtagLabel);
+
+    const actions = document.createElement("div");
+    actions.className = "post-actions";
+    card.appendChild(actions);
+
+    const likeButton = document.createElement("button");
+    likeButton.className = "btn-like";
+    likeButton.textContent = "Like";
+    likeButton.addEventListener("click", () => likePost(post, likeButton));
+    actions.appendChild(likeButton);
+
+    // Only visible for the owner of the post.
+    if (post.username === username) {
+      const deleteButton = document.createElement("button");
+      deleteButton.className = "btn-delete";
+      deleteButton.textContent = "Delete";
+      deleteButton.addEventListener("click", () => deletePost(post));
+      actions.appendChild(deleteButton);
+    }
+
+    return card;
+  }
+
+  // ============================================================
+  // CREATE POST FROM PROFILE
+  // ============================================================
+
+  document.getElementById("send-btn").addEventListener("click", () => {
+    const content = document.getElementById("profile-post-input").value.trim();
+    const hashtagsText = document.getElementById("profile-hashtag-input").value.trim();
+
+    if (!content) return;
+
+    const hashtags = parseHashtags(hashtagsText);
+
+    // Every post must have at least one hashtag.
+    if (!hashtags.length) return;
+
+    firebaseCreatePost(content, hashtags);
+  });
+
+  async function firebaseCreatePost(content, hashtags) {
+    try {
+      // ----------------------------------------------------
+      // SYNC NEW HASHTAGS
+      //
+      // Any hashtag that has never existed in the app before gets
+      // registered here for the first time, and is immediately
+      // added, at 0, to every single user's "hashtags" dictionary,
+      // so that whenever someone likes it later we only need to
+      // increment the number.
+      // ----------------------------------------------------
+
+      await syncNewHashtags(hashtags);
+
+      const postData = {
+        username: username,
+        content: content,
+        hashtags: hashtags,
+        created_at: Date.now() / 1000,
+      };
+
+      const response = await fetch(firebasePath("posts"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(postData),
+      });
+
+      if (response.ok) {
+        postCreated();
+      } else {
+        console.error("CREATE POST ERROR:", response.status, await response.text());
+      }
+    } catch (error) {
+      console.error("CREATE POST ERROR:", error);
+    }
+  }
+
+  // ============================================================
+  // SYNC NEW HASHTAGS TO REGISTRY + ALL USERS
+  // ============================================================
+
+  async function syncNewHashtags(hashtags) {
+    try {
+      const registryResponse = await fetch(firebasePath("hashtags_registry"));
+      let registry = {};
+
+      if (registryResponse.ok) {
+        const registryData = await registryResponse.json();
+        if (registryData && typeof registryData === "object") registry = registryData;
+      }
+
+      const newHashtags = hashtags
+        .map((h) => String(h).trim())
+        .filter((h) => h && !(h in registry));
+
+      if (!newHashtags.length) return;
+
+      // Register the new hashtags in the registry.
+      const registryPatch = {};
+      for (const hashtag of newHashtags) registryPatch[hashtag] = true;
+
+      await fetch(firebasePath("hashtags_registry"), {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(registryPatch),
+      });
+
+      // Add these new hashtags, at 0, to every single user's
+      // "hashtags" dictionary.
+      const usersResponse = await fetch(firebasePath("users"));
+      if (!usersResponse.ok) return;
+
+      const usersData = await usersResponse.json();
+      if (!usersData || typeof usersData !== "object") return;
+
+      const hashtagsPatch = {};
+      for (const hashtag of newHashtags) hashtagsPatch[hashtag] = 0;
+
+      for (const uname of Object.keys(usersData)) {
+        await fetch(firebasePath(`users/${uname}/hashtags`), {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(hashtagsPatch),
+        });
+      }
+    } catch (error) {
+      console.error("SYNC HASHTAGS ERROR:", error);
+    }
+  }
+
+  // ============================================================
+  // POST CREATED
+  // ============================================================
+
+  function postCreated() {
+    document.getElementById("profile-post-input").value = "";
+    document.getElementById("profile-hashtag-input").value = "";
+    loadPosts();
+    loadMyPosts();
+  }
+
+  // ============================================================
+  // LIKE POST
+  // ============================================================
+
+  function likePost(post, button) {
+    const postId = post.id;
+    const hashtags = post.hashtags || [];
+
+    if (!postId || !username) return;
+
+    // Change UI immediately.
+    button.textContent = "Liked";
+    button.disabled = true;
+
+    firebaseLikePost(postId, hashtags);
+  }
+
+  // ============================================================
+  // FIREBASE LIKE
+  //
+  // IMPORTANT:
+  // We DO NOT save which user liked which post.
+  //
+  // We only keep a per-user counter for each hashtag:
+  //
+  // "hashtags": { "art": 3, "music": 1 }
+  //
+  // Every time a user likes a post, the number for each of that
+  // post's hashtags in the user's account goes up by one.
+  // ============================================================
+
+  async function firebaseLikePost(postId, hashtags) {
+    try {
+      if (typeof hashtags === "string") hashtags = [hashtags];
+
+      const userHashtagsUrl = firebasePath(`users/${username}/hashtags`);
+      const response = await fetch(userHashtagsUrl);
+
+      if (!response.ok) {
+        console.error("LIKE LOAD ERROR:", response.status);
+        return;
+      }
+
+      const data = await response.json();
+      const currentCounts = data && typeof data === "object" ? data : {};
+
+      // Only increment the count of the hashtags that belong to
+      // this post; the user's other hashtags are left untouched.
+      const updatedCounts = {};
+
+      for (const hashtag of hashtags) {
+        const cleanHashtag = String(hashtag).replace(/#/g, "").trim();
+        if (!cleanHashtag) continue;
+        const currentValue = currentCounts[cleanHashtag] || 0;
+        updatedCounts[cleanHashtag] = currentValue + 1;
+      }
+
+      if (!Object.keys(updatedCounts).length) return;
+
+      // SAVE (only the changed keys are sent, the user's other
+      // hashtags are not erased)
+      const saveResponse = await fetch(userHashtagsUrl, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedCounts),
+      });
+
+      if (!saveResponse.ok) {
+        console.error("LIKE SAVE ERROR:", saveResponse.status);
+        return;
+      }
+
+      console.log(`LIKED: @${username} -> ${JSON.stringify(updatedCounts)}`);
+    } catch (error) {
+      console.error("LIKE ERROR:", error);
+    }
+  }
+
+  // ============================================================
+  // DELETE POST
+  // ============================================================
+
+  function deletePost(post) {
+    const postId = post.id;
+    const postUsername = String(post.username || "");
+
+    // ----------------------------------------------------
+    // SECURITY CHECK
+    //
+    // A user can only delete their own post.
+    // ----------------------------------------------------
+
+    if (!postId) return;
+    if (postUsername !== username) return;
+
+    firebaseDeletePost(postId);
+  }
+
+  async function firebaseDeletePost(postId) {
+    try {
+      const response = await fetch(firebasePath(`posts/${postId}`), { method: "DELETE" });
+
+      if (response.ok) {
+        postDeleted();
+      } else {
+        console.error("DELETE ERROR:", response.status, await response.text());
+      }
+    } catch (error) {
+      console.error("DELETE ERROR:", error);
+    }
+  }
+
+  function postDeleted() {
+    loadPosts();
+    loadMyPosts();
+  }
+
+  // ============================================================
+  // LOGOUT
+  // ============================================================
+
+  document.getElementById("logout-btn").addEventListener("click", () => {
+    token = "";
+    username = "";
+
+    document.getElementById("username-input").value = "";
+    document.getElementById("password-input").value = "";
+    setLoginMessage("");
+
+    document.getElementById("profile-post-input").value = "";
+    document.getElementById("profile-hashtag-input").value = "";
+
+    showScreen("login-screen");
+  });
+</script>
+
+</body>
+</html>
